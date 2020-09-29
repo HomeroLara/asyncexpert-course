@@ -3,6 +3,12 @@ using BenchmarkDotNet.Attributes;
 
 namespace Dotnetos.AsyncExpert.Homework.Module01.Benchmark
 {
+    [AsciiDocExporter]
+    [CsvExporter]
+    [HtmlExporter]
+    [JsonExporter]
+    [RPlotExporter]
+    [CsvMeasurementsExporter]
     [DisassemblyDiagnoser(exportCombinedDisassemblyReport: true)]
     public class FibonacciCalc
     {
@@ -26,14 +32,46 @@ namespace Dotnetos.AsyncExpert.Homework.Module01.Benchmark
         [ArgumentsSource(nameof(Data))]
         public ulong RecursiveWithMemoization(ulong n)
         {
-            return 0;
+            if (n == 1 || n == 2)
+            {
+                return 1;
+            }
+
+            var values = new ulong[n + 1];
+            values[0] = 0;
+            values[1] = 1;
+
+            return RecursiveCalculation(n, values);
+        }
+
+        protected ulong RecursiveCalculation(ulong n, ulong[] values)
+        {
+            var val = RecursiveCalculation(n - 1, values) + RecursiveCalculation(n - 2, values);
+            values[n] = val;
+
+            return val;
         }
         
         [Benchmark]
         [ArgumentsSource(nameof(Data))]
         public ulong Iterative(ulong n)
         {
-            return 0;
+            if (n == 1 || n == 2)
+            {
+                return 1;
+            }
+
+            ulong val1 = 1;
+            ulong val2 = 2;
+
+            for ( ulong nXi=0; nXi<n; nXi++ )
+            {
+                ulong val3 = val1;
+                val1 = val2;
+                val2 = val3 + val2;
+            }
+
+            return val1;
         }
 
         public IEnumerable<ulong> Data()
